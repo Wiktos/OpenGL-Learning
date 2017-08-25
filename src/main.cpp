@@ -16,19 +16,17 @@ void simpleProcessInput(GLFWwindow* window)
 
 const GLchar* vertexShaderSource = "#version 330 core\n"
 "layout (location = 0) in vec3 aPos;\n"
-"out vec4 vertexColor;\n"
 "void main()\n"
 "{\n"
 "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-"	vertexColor = vec4(1.0, 0.3, 0.8, 1.0);\n"
 "}\0";
 
 const GLchar* fragmentShaderSource = "#version 330 core\n"
 "out vec4 FragColor;\n"
-"in vec4 vertexColor;\n"
+"uniform vec4 color;\n"
 "void main()\n"
 "{\n"
-"   FragColor = vertexColor;\n"
+"   FragColor = color;\n"
 "}\n\0";
 
 int main()
@@ -128,9 +126,15 @@ int main()
 	
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClearColor(0.1f, 0.5f, 0.8f, 1.0f);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+		//uncomment to see lines of triangles which make rectangle on the screen
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+		GLfloat currTimeValue = GLFWAdapter::getInstance().getTime();
+		GLfloat randomColor = sin(currTimeValue) / 2.0f + 0.5f;
+		int colorLocationInShader = glGetUniformLocation(shaderProgram, "color");
 		glUseProgram(shaderProgram);
+		glUniform4f(colorLocationInShader, 0.0f, randomColor, 0.0f, 1.0f);
 		glBindVertexArray(VertexArrayObject);
 		glDrawElements(GL_TRIANGLES, _countof(indices), GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);

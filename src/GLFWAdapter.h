@@ -11,6 +11,7 @@ public:
 	void configureVersions(GLuint majorVersion, GLuint minorVersion);
 	void terminate();
 	void pollEvents();
+	GLfloat getTime();
 private:
 	GLFWAdapter() {};
 	GLFWAdapter(const GLFWAdapter&) = delete;

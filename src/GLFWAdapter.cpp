@@ -33,3 +33,8 @@ void GLFWAdapter::pollEvents()
 {
 	glfwPollEvents();
 }
+
+GLfloat GLFWAdapter::getTime()
+{
+	 return glfwGetTime();
+}
