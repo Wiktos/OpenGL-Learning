@@ -1,5 +1,7 @@
 #include "GLFWAdapter.h"
 
+using namespace std;
+
 GLFWAdapter& GLFWAdapter::getInstance()
 {
 	static GLFWAdapter glfwAdapter;
@@ -8,10 +10,11 @@ GLFWAdapter& GLFWAdapter::getInstance()
 
 void GLFWAdapter::init()
 {
-	glfwInit();
+	if (!glfwInit())
+		throw exception("Failed to init GLFW");
 }
 
-void GLFWAdapter::configureVersions(GLuint majorVersion, GLuint minorVersion)
+void GLFWAdapter::configureVersions(GLuint minorVersion, GLuint majorVersion)
 {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, majorVersion);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, minorVersion);
