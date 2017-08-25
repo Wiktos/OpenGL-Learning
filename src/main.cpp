@@ -55,6 +55,22 @@ int main()
 	glBindTexture(GL_TEXTURE_2D, 0);
 	SOIL_free_image_data(imageData);
 
+	int width2, height2, nrChannel2;
+	unsigned char* image2Data = SOIL_load_image(".\\res\\gik.jpg", &width2, &height2, 0, SOIL_LOAD_RGB);
+	if(image2Data == nullptr)
+		throw exception("Failed to load texture file");
+
+	GLuint texture02;
+	glGenTextures(1, &texture02);
+
+	glBindTexture(GL_TEXTURE_2D, texture02);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width2, height2, 0, GL_RGB, GL_UNSIGNED_BYTE, image2Data);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	SOIL_free_image_data(image2Data);
+
 
 	GLfloat vertices[] = {
 		0.6f,  0.6f,  0.0f,		1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
@@ -110,8 +126,15 @@ int main()
 		//uncomment to see lines of triangles which make rectangle on the screen
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture01);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, texture02);
+
 		shaderProgram.use();
+		shaderProgram.setInt("texture0", 0);
+		shaderProgram.setInt("texture1", 1);
+
 		glBindVertexArray(VertexArrayObject);
 		glDrawElements(GL_TRIANGLES, _countof(indices), GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
