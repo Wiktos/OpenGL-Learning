@@ -1,5 +1,6 @@
 #define GLEW_STATIC
 #include <iostream>
+#include <SOIL.h>
 
 #include "OpenGLWindow.h"
 #include "shprogram.h"
@@ -14,24 +15,6 @@ void simpleProcessInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
 }
-
-const GLchar* vertexShaderSource = "#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-"layout (location = 1) in vec4 aColor;\n"
-"out vec4 ourColor;\n"
-"void main()\n"
-"{\n"
-"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-"   ourColor = aColor;\n"
-"}\0";
-
-const GLchar* fragmentShaderSource = "#version 330 core\n"
-"out vec4 FragColor;\n"
-"in vec4 ourColor;\n"
-"void main()\n"
-"{\n"
-"   FragColor = ourColor;\n"
-"}\n\0";
 
 int main()
 {
@@ -49,14 +32,40 @@ int main()
 
 	ShaderProgram shaderProgram(".\\res\\vertexShader.vert", ".\\res\\fragmentShader.frag");
 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	int width, height, nrChannel;
+	
+	unsigned char* imageData = SOIL_load_image(".\\res\\weiti.png", &width, &height, &nrChannel, SOIL_LOAD_RGB);
+	if (imageData == nullptr)
+		throw exception("Failed to load texture file");
+
+	GLuint texture01;
+	glGenTextures(1, &texture01);
+
+	glBindTexture(GL_TEXTURE_2D, texture01);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	SOIL_free_image_data(imageData);
+
+
 	GLfloat vertices[] = {
-		0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
-		-0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // bottom left
-		0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // top 
+		0.6f,  0.6f,  0.0f,		1.0f, 0.0f, 0.0f,	1.0f,  0.0f,
+		-0.6f,  0.6f,  0.0f,	0.0f, 1.0f, 0.0f,	0.0f,  0.0f,
+		-0.6f, -0.6f,  0.0f,	0.0f, 0.0f, 1.0f,	0.0f,  1.0f,
+		0.6f, -0.6f,  0.0f,		1.0f, 0.0f, 1.0f,	1.0f,  1.0f,
 	};
 
 	GLuint indices[] = {  
-		0, 1, 2,   
+		0, 1, 3,
+		1, 2, 3
 	};
 
 	GLuint VertexBufferObject;
@@ -75,10 +84,12 @@ int main()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferObject);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), 0);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);	
 	glBindVertexArray(0);
@@ -99,6 +110,7 @@ int main()
 		//uncomment to see lines of triangles which make rectangle on the screen
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+		glBindTexture(GL_TEXTURE_2D, texture01);
 		shaderProgram.use();
 		glBindVertexArray(VertexArrayObject);
 		glDrawElements(GL_TRIANGLES, _countof(indices), GL_UNSIGNED_INT, 0);
