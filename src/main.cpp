@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "OpenGLWindow.h"
+#include "shprogram.h"
 
 using namespace std;
 
@@ -46,43 +47,7 @@ int main()
 	if (glewInit() != GLEW_OK)
 		throw exception("GLEW Initialization failed");
 
-	GLuint vertexShader;
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
-	glCompileShader(vertexShader);
-	int success;
-	char infoLog[512];
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << endl;
-	}
-
-	GLuint fragmentShader;
-	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
-	glCompileShader(fragmentShader);
-	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(fragmentShader, 512, nullptr, infoLog);
-		cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << endl;
-	}
-
-	GLuint shaderProgram;
-	shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-	if (!success)
-	{
-		glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
-		cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n" << infoLog << endl;
-	}
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
+	ShaderProgram shaderProgram(".\\res\\vertexShader.vert", ".\\res\\fragmentShader.frag");
 
 	GLfloat vertices[] = {
 		0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
@@ -91,7 +56,7 @@ int main()
 	};
 
 	GLuint indices[] = {  
-		0, 1, 2,   // first triangle
+		0, 1, 2,   
 	};
 
 	GLuint VertexBufferObject;
@@ -134,11 +99,7 @@ int main()
 		//uncomment to see lines of triangles which make rectangle on the screen
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-		GLfloat currTimeValue = GLFWAdapter::getInstance().getTime();
-		GLfloat randomColor = sin(currTimeValue) / 2.0f + 0.5f;
-		int colorLocationInShader = glGetUniformLocation(shaderProgram, "color");
-		glUseProgram(shaderProgram);
-		glUniform4f(colorLocationInShader, 0.0f, randomColor, 0.0f, 1.0f);
+		shaderProgram.use();
 		glBindVertexArray(VertexArrayObject);
 		glDrawElements(GL_TRIANGLES, _countof(indices), GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
