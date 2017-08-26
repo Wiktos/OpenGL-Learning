@@ -118,6 +118,18 @@ int main()
 		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
 		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 	};
+	glm::vec3 cubePositions[] = {
+		glm::vec3(0.0f,  0.0f,  0.0f),
+		glm::vec3(2.0f,  5.0f, -15.0f),
+		glm::vec3(-1.5f, -2.2f, -2.5f),
+		glm::vec3(-3.8f, -2.0f, -12.3f),
+		glm::vec3(2.4f, -0.4f, -3.5f),
+		glm::vec3(-1.7f,  3.0f, -7.5f),
+		glm::vec3(1.3f, -2.0f, -2.5f),
+		glm::vec3(1.5f,  2.0f, -2.5f),
+		glm::vec3(1.5f,  0.2f, -1.5f),
+		glm::vec3(-1.3f,  1.0f, -1.5f)
+	};
 
 	GLuint VertexBufferObject;
 	GLuint VertexArrayObject;
@@ -164,22 +176,26 @@ int main()
 		shaderProgram.use();
 		shaderProgram.setInt("texture0", 0);
 		shaderProgram.setInt("texture1", 1);
-		
-		glm::mat4 model;
-		model = glm::rotate(model, (GLfloat)GLFWAdapter::getInstance().getTime() + glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 
 		glm::mat4 view;
-		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
 
 		glm::mat4 projection;
 		projection = glm::perspective(glm::radians(45.0f), (GLfloat)(WINDOW_WIDTH / WINDOW_HEIGHT), 0.1f, 100.0f);
 
-		shaderProgram.setMat4("model", model);
 		shaderProgram.setMat4("view", view);
 		shaderProgram.setMat4("projection", projection);
 
 		glBindVertexArray(VertexArrayObject);
-		glDrawArrays(GL_TRIANGLES, 0, _countof(vertices));
+		for (int i = 0; i < _countof(cubePositions); i++)
+		{
+			glm::mat4 model;
+			model = glm::translate(model, cubePositions[i]);
+			model = glm::rotate(model, GLFWAdapter::getInstance().getTime() + glm::radians(20.0f * i), glm::vec3(1.0f, 0.3f, 0.5f));
+			shaderProgram.setMat4("model", model);
+
+			glDrawArrays(GL_TRIANGLES, 0, _countof(vertices));
+		}
 		glBindVertexArray(0);
 		glUseProgram(0);
 
