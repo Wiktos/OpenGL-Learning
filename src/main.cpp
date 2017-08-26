@@ -37,6 +37,50 @@ void processInput(GLFWwindow* window)
 		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 }
 
+
+GLfloat lastMouseX = 400;
+GLfloat lastMouseY = 300;
+
+GLfloat yaw = -90.0f;
+GLfloat pitch = 0.0f;
+
+void mouseCallback(GLFWwindow* window, GLdouble xpos, GLdouble ypos)
+{
+	GLfloat xoffset = xpos - lastMouseX;
+	GLfloat yoffset = lastMouseY - ypos;
+	lastMouseX = xpos;
+	lastMouseY = ypos;
+
+	GLfloat sensitivity = 0.1f;
+	xoffset *= sensitivity;
+	yoffset *= sensitivity;
+
+	yaw += xoffset;
+	pitch += yoffset;
+
+	if (pitch > 89.0f)
+		pitch = 89.0f;
+	if (pitch < -89.0f)
+		pitch = -89.0f;
+
+	glm::vec3 front;
+	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	front.y = sin(glm::radians(pitch));
+	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	cameraFront = glm::normalize(front);
+}
+
+GLfloat fov = 45.0f;
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	if (fov >= 1.0f && fov <= 45.0f)
+		fov -= yoffset;
+	if (fov <= 1.0f)
+		fov = 1.0f;
+	if (fov >= 45.0f)
+		fov = 45.0f;
+}
+
 int main()
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
@@ -46,6 +90,12 @@ int main()
 
 	OpenGLWindow appWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "OpenGL Program");
 	appWindow.setAsMainContext();
+
+	glfwSetInputMode(appWindow.getInstance(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetCursorPosCallback(appWindow.getInstance(), mouseCallback);
+	glfwSetCursorPos(appWindow.getInstance(), lastMouseX, lastMouseY);
+
+	glfwSetScrollCallback(appWindow.getInstance(), scroll_callback);
 
 	glewExperimental = GL_TRUE;
 	if (glewInit() != GLEW_OK)
@@ -76,7 +126,7 @@ int main()
 	SOIL_free_image_data(imageData);
 
 	int width2, height2, nrChannel2;
-	unsigned char* image2Data = SOIL_load_image(".\\res\\gik.jpg", &width2, &height2, 0, SOIL_LOAD_RGB);
+	unsigned char* image2Data = SOIL_load_image(".\\res\\wgik.jpg", &width2, &height2, 0, SOIL_LOAD_RGB);
 	if(image2Data == nullptr)
 		throw exception("Failed to load texture file");
 
@@ -167,9 +217,8 @@ int main()
 
 		appWindow.setProcessInputMethod(processInput);
 		appWindow.swapBuffers();
-	
-		glEnable(GL_DEPTH_TEST);
 
+		glEnable(GL_DEPTH_TEST);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClearColor(0.1f, 0.5f, 0.8f, 1.0f);
 
@@ -186,13 +235,14 @@ int main()
 		shaderProgram.setInt("texture1", 1);
 
 		glm::mat4 model;
-		model = glm::rotate(model, glm::radians(55.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
 		glm::mat4 view;
 		view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
 		glm::mat4 projection;
-		projection = glm::perspective(glm::radians(45.0f), (GLfloat)(WINDOW_WIDTH / WINDOW_HEIGHT), 0.1f, 100.0f);
+		projection = glm::perspective(glm::radians(fov), (GLfloat)(WINDOW_WIDTH / WINDOW_HEIGHT), 0.1f, 100.0f);
 
 		shaderProgram.setMat4("model", model);
 		shaderProgram.setMat4("view", view);

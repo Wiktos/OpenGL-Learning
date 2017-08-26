@@ -14,6 +14,10 @@ public:
 	void setWindowShouldClose();
 	void swapBuffers();
 	void setProcessInputMethod(void(*processInput)(GLFWwindow*));
+	GLFWwindow* getInstance()
+	{
+		return instance;
+	}
 private:
 	static void default_framebuffer_size_callback(GLFWwindow* window, int width, int height);
 };
