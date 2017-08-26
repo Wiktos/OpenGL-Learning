@@ -138,11 +138,18 @@ int main()
 		shaderProgram.setInt("texture0", 0);
 		shaderProgram.setInt("texture1", 1);
 		
-		glm::mat4 trans;
-		trans = glm::translate(trans, glm::vec3(-0.25f, -0.5f, 0.0f));
-		trans = glm::scale(trans, glm::vec3(-0.5f, 0.5f, 0.0f));
-		trans = glm::rotate(trans, (GLfloat)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-		shaderProgram.setMat4("transform", trans);
+		glm::mat4 model;
+		model = glm::rotate(model, glm::radians(-0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+		glm::mat4 view;
+		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+
+		glm::mat4 projection;
+		projection = glm::perspective(glm::radians(45.0f), (GLfloat)(WINDOW_WIDTH / WINDOW_HEIGHT), 0.1f, 100.0f);
+
+		shaderProgram.setMat4("model", model);
+		shaderProgram.setMat4("view", view);
+		shaderProgram.setMat4("projection", projection);
 
 		glBindVertexArray(VertexArrayObject);
 		glDrawElements(GL_TRIANGLES, _countof(indices), GL_UNSIGNED_INT, 0);
