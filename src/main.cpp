@@ -76,32 +76,59 @@ int main()
 
 
 	GLfloat vertices[] = {
-		0.6f,  0.6f,  0.0f,		1.0f,  0.0f,
-		-0.6f,  0.6f,  0.0f,	0.0f,  0.0f,
-		-0.6f, -0.6f,  0.0f,	0.0f,  1.0f,
-		0.6f, -0.6f,  0.0f,		1.0f,  1.0f,
-	};
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+		0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 
-	GLuint indices[] = {  
-		0, 1, 3,
-		1, 2, 3
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 	};
 
 	GLuint VertexBufferObject;
 	GLuint VertexArrayObject;
-	GLuint ElementBufferObject;
 
 	glGenVertexArrays(1, &VertexArrayObject);
 	glGenBuffers(1, &VertexBufferObject);
-	glGenBuffers(1, &ElementBufferObject);
 
 	glBindVertexArray(VertexArrayObject);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VertexBufferObject);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ElementBufferObject);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0);
 	glEnableVertexAttribArray(0);
@@ -121,7 +148,9 @@ int main()
 		appWindow.setProcessInputMethod(simpleProcessInput);
 		appWindow.swapBuffers();
 	
-		glClear(GL_COLOR_BUFFER_BIT);
+		glEnable(GL_DEPTH_TEST);
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClearColor(0.1f, 0.5f, 0.8f, 1.0f);
 
 		//uncomment to see lines of triangles which make rectangle on the screen
@@ -137,7 +166,7 @@ int main()
 		shaderProgram.setInt("texture1", 1);
 		
 		glm::mat4 model;
-		model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::rotate(model, (GLfloat)GLFWAdapter::getInstance().getTime() + glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 
 		glm::mat4 view;
 		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
@@ -150,13 +179,14 @@ int main()
 		shaderProgram.setMat4("projection", projection);
 
 		glBindVertexArray(VertexArrayObject);
-		glDrawElements(GL_TRIANGLES, _countof(indices), GL_UNSIGNED_INT, 0);
+		glDrawArrays(GL_TRIANGLES, 0, _countof(vertices));
 		glBindVertexArray(0);
 		glUseProgram(0);
+
+		glDisable(GL_DEPTH_TEST);
 	}
 
 	glDeleteBuffers(1, &VertexBufferObject);
-	glDeleteBuffers(1, &ElementBufferObject);
 	glDeleteVertexArrays(1, &VertexArrayObject);
 
 	GLFWAdapter::getInstance().terminate();
