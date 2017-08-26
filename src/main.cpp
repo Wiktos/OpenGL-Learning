@@ -14,10 +14,24 @@ using namespace std;
 constexpr GLuint WINDOW_WIDTH = 800;
 constexpr GLuint WINDOW_HEIGHT = 600;
 
-void simpleProcessInput(GLFWwindow* window)
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+void processInput(GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
+
+	GLfloat cameraSpeed = 0.001f; // adjust accordingly
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		cameraPos += cameraSpeed * cameraFront;
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		cameraPos -= cameraSpeed * cameraFront;
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 }
 
 int main()
@@ -157,7 +171,7 @@ int main()
 
 		GLFWAdapter::getInstance().pollEvents();
 
-		appWindow.setProcessInputMethod(simpleProcessInput);
+		appWindow.setProcessInputMethod(processInput);
 		appWindow.swapBuffers();
 	
 		glEnable(GL_DEPTH_TEST);
@@ -180,11 +194,8 @@ int main()
 		glm::mat4 model;
 		model = glm::rotate(model, glm::radians(55.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 
-		float radius = 10.0f;
-		float camX = sin(glfwGetTime()) * radius;
-		float camZ = cos(glfwGetTime()) * radius;
 		glm::mat4 view;
-		view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+		view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
 		glm::mat4 projection;
 		projection = glm::perspective(glm::radians(45.0f), (GLfloat)(WINDOW_WIDTH / WINDOW_HEIGHT), 0.1f, 100.0f);
