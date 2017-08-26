@@ -2,6 +2,10 @@
 #include <iostream>
 #include <SOIL.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include "OpenGLWindow.h"
 #include "shprogram.h"
 
@@ -39,7 +43,6 @@ int main()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	int width, height, nrChannel;
-	
 	unsigned char* imageData = SOIL_load_image(".\\res\\weiti.png", &width, &height, &nrChannel, SOIL_LOAD_RGB);
 	if (imageData == nullptr)
 		throw exception("Failed to load texture file");
@@ -134,6 +137,12 @@ int main()
 		shaderProgram.use();
 		shaderProgram.setInt("texture0", 0);
 		shaderProgram.setInt("texture1", 1);
+		
+		glm::mat4 trans;
+		trans = glm::translate(trans, glm::vec3(-0.25f, -0.5f, 0.0f));
+		trans = glm::scale(trans, glm::vec3(-0.5f, 0.5f, 0.0f));
+		trans = glm::rotate(trans, (GLfloat)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+		shaderProgram.setMat4("transform", trans);
 
 		glBindVertexArray(VertexArrayObject);
 		glDrawElements(GL_TRIANGLES, _countof(indices), GL_UNSIGNED_INT, 0);

@@ -1,3 +1,4 @@
+#define GLEW_STATIC
 #include <string>
 #include <iostream>
 #include <fstream>

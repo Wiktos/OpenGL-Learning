@@ -1,5 +1,8 @@
 #pragma once
+#define GLEW_STATIC
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include <GL/glew.h>
 
 class ShaderProgram
