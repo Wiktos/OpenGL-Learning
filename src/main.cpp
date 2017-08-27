@@ -12,8 +12,8 @@
 
 using namespace std;
 
-constexpr GLuint WINDOW_WIDTH = 800;
-constexpr GLuint WINDOW_HEIGHT = 600;
+constexpr GLuint WINDOW_WIDTH = 1200;
+constexpr GLuint WINDOW_HEIGHT = 800;
 
 FPSCamera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
@@ -48,7 +48,7 @@ void mouseCallback(GLFWwindow* window, GLdouble xpos, GLdouble ypos)
 	camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+void scroll_callback(GLFWwindow* window, GLdouble xoffset, GLdouble yoffset)
 {
 	camera.ProcessMouseScroll(yoffset);
 }
@@ -166,8 +166,9 @@ int main()
 
 		//uncomment to see lines of triangles which make rectangle on the screen
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
+	
 		glm::mat4 model;
+		model = glm::rotate(model, glm::radians(20.0f + (GLfloat)glfwGetTime() * 30), glm::vec3(0.0f, 1.0f, 0.0f));
 
 		glm::mat4 view;
 		view = camera.GetViewMatrix();
@@ -177,10 +178,25 @@ int main()
 
 		//Brightened object
 		lightingShader.use();
-		lightingShader.setVec3("objColor", 1.0f, 0.5f, 0.31f);
-		lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-		lightingShader.setVec3("lightPos", lightPos);
 		lightingShader.setVec3("viewPos", camera.Position);
+
+		lightingShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
+		lightingShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
+		lightingShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+		lightingShader.setFloat("material.shininess", 32.0f);
+
+		glm::vec3 lightColor;
+		lightColor.x = sin(glfwGetTime() * 2.0f);
+		lightColor.y = sin(glfwGetTime() * 0.7f);
+		lightColor.z = sin(glfwGetTime() * 1.3f);
+
+		glm::vec3 diffuseColor = lightColor   * glm::vec3(0.5f); // decrease the influence
+		glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // low influence
+
+		lightingShader.setVec3("light.ambient", ambientColor);
+		lightingShader.setVec3("light.diffuse", diffuseColor);
+		lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+		lightingShader.setVec3("light.position", lightPos);
 
 		lightingShader.setMat4("model", model);
 		lightingShader.setMat4("view", view);
