@@ -216,6 +216,8 @@ int main()
 		lampShader.setMat4("view", view);
 		lampShader.setMat4("projection", projection);
 
+		lampShader.setVec3("lampColor", lightColor);
+
 		glBindVertexArray(VertexArrayLight);
 		glDrawArrays(GL_TRIANGLES, 0, _countof(vertices));
 

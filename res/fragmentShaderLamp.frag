@@ -1,7 +1,9 @@
 #version 330 core
-out vec4 FragColor;
+out vec3 FragColor;
+
+uniform vec3 lampColor;
 
 void main()
 {
-    FragColor = vec4(1.0); // set all 4 vector values to 1.0
+    FragColor = lampColor; // set all 4 vector values to 1.0
 }
