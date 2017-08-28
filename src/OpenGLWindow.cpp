@@ -10,6 +10,7 @@ OpenGLWindow::OpenGLWindow(int width, int height, string title)
 		throw runtime_error("Failed to create window");
 	}
 	glfwSetFramebufferSizeCallback(instance, default_framebuffer_size_callback);
+	glfwWindowHint(GL_LOCATION, 100);
 }
 
 void OpenGLWindow::default_framebuffer_size_callback(GLFWwindow* window, int width, int height)
