@@ -175,7 +175,7 @@ int main()
 	SOIL_free_image_data(imageData);
 
 	int width2, height2, nrChannel2;
-	unsigned char* imageData2 = SOIL_load_image(".//res//diffuseMap.png", &width2, &height2, &nrChannel2, SOIL_LOAD_RGB);
+	unsigned char* imageData2 = SOIL_load_image(".//res//specularMap.png", &width2, &height2, &nrChannel2, SOIL_LOAD_RGB);
 	GLuint specularMap;
 	glGenTextures(1, &specularMap);
 	glBindTexture(GL_TEXTURE_2D, specularMap);
@@ -199,7 +199,7 @@ int main()
 
 		glEnable(GL_DEPTH_TEST);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 
 		//uncomment to see lines of triangles which make rectangle on the screen
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -234,7 +234,10 @@ int main()
 		lightingShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
 		lightingShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
 		lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-		lightingShader.setVec3("light.direction", -0.2f, -1.0f, -0.3f);
+		lightingShader.setVec3("light.position", lightPos);
+		lightingShader.setFloat("light.constant", 1.0f);
+		lightingShader.setFloat("light.linear", 0.09f);
+		lightingShader.setFloat("light.quadratic", 0.032f);
 
 		lightingShader.setMat4("model", model);
 		lightingShader.setMat4("view", view);
@@ -252,7 +255,7 @@ int main()
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 		
-		/*//lamp
+		//lamp
 		lampShader.use();
 
 		model = glm::mat4();
@@ -265,7 +268,7 @@ int main()
 
 		glBindVertexArray(VertexArrayLight);
 		glDrawArrays(GL_TRIANGLES, 0, _countof(vertices));
-		*/
+		
 		glBindVertexArray(0);
 		glUseProgram(0);
 
