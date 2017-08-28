@@ -35,7 +35,7 @@ void processInput(GLFWwindow* window)
 		camera.ProcessKeyboard(RIGHT, deltaTime);
 }
 
-GLfloat lastMouseX = 400;
+GLfloat lastMouseX = 400; 
 GLfloat lastMouseY = 300;
 
 void mouseCallback(GLFWwindow* window, GLdouble xpos, GLdouble ypos)
@@ -124,6 +124,19 @@ int main()
 		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
 	};
 
+	glm::vec3 cubePositions[] = {
+		glm::vec3(0.0f,  0.0f,  0.0f),
+		glm::vec3(2.0f,  5.0f, -15.0f),
+		glm::vec3(-1.5f, -2.2f, -2.5f),
+		glm::vec3(-3.8f, -2.0f, -12.3f),
+		glm::vec3(2.4f, -0.4f, -3.5f),
+		glm::vec3(-1.7f,  3.0f, -7.5f),
+		glm::vec3(1.3f, -2.0f, -2.5f),
+		glm::vec3(1.5f,  2.0f, -2.5f),
+		glm::vec3(1.5f,  0.2f, -1.5f),
+		glm::vec3(-1.3f,  1.0f, -1.5f)
+	};
+
 	GLuint VertexBufferObject;
 	GLuint VertexArrayObject;
 
@@ -203,7 +216,7 @@ int main()
 		//Brightened object
 		lightingShader.use();
 		lightingShader.setVec3("viewPos", camera.Position);
-		lightingShader.setFloat("material.shininess", 32.0f);
+		lightingShader.setFloat("material.shininess", 64.0f);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, diffuseMap);
@@ -221,16 +234,25 @@ int main()
 		lightingShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
 		lightingShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
 		lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-		lightingShader.setVec3("light.position", lightPos);
+		lightingShader.setVec3("light.direction", -0.2f, -1.0f, -0.3f);
 
 		lightingShader.setMat4("model", model);
 		lightingShader.setMat4("view", view);
 		lightingShader.setMat4("projection", projection);
 
 		glBindVertexArray(VertexArrayObject);
-		glDrawArrays(GL_TRIANGLES, 0, _countof(vertices));
+		for (unsigned int i = 0; i < 10; i++)
+		{
+			glm::mat4 model;
+			model = glm::translate(model, cubePositions[i]);
+			float angle = 20.0f * i;
+			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+			lightingShader.setMat4("model", model);
+
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
 		
-		//lamp
+		/*//lamp
 		lampShader.use();
 
 		model = glm::mat4();
@@ -243,7 +265,7 @@ int main()
 
 		glBindVertexArray(VertexArrayLight);
 		glDrawArrays(GL_TRIANGLES, 0, _countof(vertices));
-
+		*/
 		glBindVertexArray(0);
 		glUseProgram(0);
 

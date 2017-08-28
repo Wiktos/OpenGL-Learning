@@ -9,7 +9,7 @@ in vec2 TexCoords;
 uniform Material material;
 
 struct Light {
-    vec3 position;
+    vec3 direction;
   
     vec3 ambient;
     vec3 diffuse;
@@ -30,7 +30,7 @@ void main()
 	vec3 ambient = light.ambient * vec3(texture(material.diffuse, TexCoords));
 
 	vec3 norm = normalize(Normal);
-	vec3 lightDir = normalize(light.position - FragPos);
+	vec3 lightDir = normalize(-light.direction);
 	float diff = max(dot(norm, lightDir), 0.0);
 	vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, TexCoords));
 
