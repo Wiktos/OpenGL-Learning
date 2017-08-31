@@ -7,6 +7,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <irrKlang\irrKlang.h>
+
 #include "OpenGLWindow.h"
 #include "shprogram.h"
 #include "FPSCamera.h"
@@ -78,6 +80,9 @@ int main()
 	ShaderProgram shader(".\\res\\vertexShaderLight.vert", ".\\res\\fragmentShaderLight.frag");
 	Model nanosuite(".\\res\\planes\\Boeing727.obj");
 
+	irrklang::ISoundEngine* soundEngine = irrklang::createIrrKlangDevice();
+	soundEngine->play2D(".\\res\\avion.mp3", GL_TRUE);
+
 	//render contexts
 	while (!appWindow.shouldWindowClose())
 	{
@@ -116,7 +121,7 @@ int main()
 		nanosuite.draw(shader);
 	}
 	
-
+	soundEngine->drop(); 
 	GLFWAdapter::getInstance().terminate();
 	return 0;
 }
